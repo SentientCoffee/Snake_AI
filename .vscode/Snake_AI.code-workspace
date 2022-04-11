@@ -1,0 +1,107 @@
+{
+  "folders": [
+    {
+      "name": "Root",
+      "path": "..",
+    },
+    {
+      "name": "Source",
+      "path": "../snake_ai",
+    },
+  ],
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Build and debug",
+        "type": "cppvsdbg",
+        "request": "launch",
+        "preLaunchTask": "Build debug",
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder:Root}",
+        "program": "${workspaceFolder:Root}/build/debug/snake_ai_d.exe",
+        "args": [],
+        "environment": [],
+        "console": "integratedTerminal",
+        "symbolSearchPath": "${workspaceFolder:Root}/build/debug",
+        "requireExactSource": true,
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Build debug",
+        "detail": "Build debug binary with debug symbols",
+        "type": "shell",
+        "command": "build debug",
+        "group": {
+          "kind": "build",
+          "isDefault": false,
+        },
+        "options": {
+          "cwd": "${workspaceFolder:Root}",
+        },
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared",
+          "showReuseMessage": false,
+          "clear": true,
+        },
+        "problemMatcher": {
+          "owner": "odin",
+          "source": "odin",
+          "fileLocation": "absolute",
+          "severity": "error",
+          "pattern": {
+            "regexp": "(.*)[(]([0-9]+)[:]([0-9]+)[)](.*)",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "message": 4,
+          },
+        },
+      },
+      {
+        "label": "Build release",
+        "detail": "Build release binary",
+        "type": "shell",
+        "command": "build",
+        "group": {
+          "kind": "build",
+          "isDefault": true,
+        },
+        "options": {
+          "cwd": "${workspaceFolder:Root}"
+        },
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared",
+          "showReuseMessage": false,
+          "clear": true,
+        },
+        "problemMatcher": {
+          "owner": "odin",
+          "source": "odin",
+          "fileLocation": "absolute",
+          "severity": "error",
+          "pattern": {
+            "regexp": "(.*)[(]([0-9]+)[:]([0-9]+)[)](.*)",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "message": 4,
+          },
+        },
+      }
+    ]
+  },
+  "settings": {
+    "debug.allowBreakpointsEverywhere": true,
+  },
+}
