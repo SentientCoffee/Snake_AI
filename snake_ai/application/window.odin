@@ -29,11 +29,6 @@ create_window :: proc(width, height: int, title: string) -> (window: ^Window) {
     set_window_callbacks :: proc(handle : glfw.WindowHandle) {
         glfw.SetWindowCloseCallback(handle, window_close_callback)
         glfw.SetWindowSizeCallback (handle, window_size_callback )
-
-        glfw.SetKeyCallback        (handle, input.key_press_callback     )
-        glfw.SetMouseButtonCallback(handle, input.mouse_button_callback  )
-        glfw.SetCursorPosCallback  (handle, input.mouse_position_callback)
-        glfw.SetScrollCallback     (handle, input.mouse_scroll_callback  )
     }
 
     window_close_callback :: proc "c" (handle : glfw.WindowHandle) {
@@ -69,6 +64,7 @@ create_window :: proc(width, height: int, title: string) -> (window: ^Window) {
 
     glfw.MakeContextCurrent(handle)
     set_window_callbacks(handle)
+    input.init(handle)
 
     gl.load_up_to(gl_major_version, gl_minor_version, glfw.gl_set_proc_address)
 

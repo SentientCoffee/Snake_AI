@@ -1,9 +1,11 @@
 package renderer
 
+import "../math"
+
 Quad :: struct {
-    position : Vector3,
-    dimensions : Vector2,
-    tint : Color,
+    position   : math.Vector3,
+    dimensions : math.Vector2,
+    tint       : Color,
 
     // @Todo: Textures
     // texture : rawptr = nil
@@ -26,19 +28,19 @@ Renderer_Storage :: struct {
 // -----------------------------------------------------------------------------------
 
 
-init_renderer :: proc(width, height : int) {
+init :: proc(width, height : int) {
     quad_indices  :: []u32 { 0, 1, 2, 0, 2, 3 };
     quad_vertices :: []Vertex {
-        Vertex{ position = Vector3{ -0.5, -0.5, 0.0 }, normal = Vector3{ 0.0, 0.0, 0.0 }, uv_coords = Vector2{ 0.0, 1.0 } },
-        Vertex{ position = Vector3{  0.5, -0.5, 0.0 }, normal = Vector3{ 0.0, 0.0, 0.0 }, uv_coords = Vector2{ 1.0, 1.0 } },
-        Vertex{ position = Vector3{  0.5,  0.5, 0.0 }, normal = Vector3{ 0.0, 0.0, 0.0 }, uv_coords = Vector2{ 1.0, 0.0 } },
-        Vertex{ position = Vector3{ -0.5,  0.5, 0.0 }, normal = Vector3{ 0.0, 0.0, 0.0 }, uv_coords = Vector2{ 0.0, 0.0 } },
+        { position = { -0.5, -0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 0.0, 1.0 } },
+        { position = {  0.5, -0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 1.0, 1.0 } },
+        { position = {  0.5,  0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 1.0, 0.0 } },
+        { position = { -0.5,  0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 0.0, 0.0 } },
     }
 
     using g_renderer_storage
     init_camera(&camera, 0, cast(f32) width, 0, cast(f32) height)
-    quad_mesh = new_mesh(quad_vertices, quad_indices)
-    quad_shader = new_2d_quad_shader()
+    quad_mesh     = new_mesh(quad_vertices, quad_indices)
+    quad_shader   = new_2d_quad_shader()
     white_texture = new_texture_2d(1, 1, rawptr(&white_texture_data))
 
     new_2d_quad_shader :: proc() -> (shader : ^Shader) {
@@ -87,7 +89,7 @@ init_renderer :: proc(width, height : int) {
     }
 }
 
-deinit_renderer :: proc() {
+destroy :: proc() {
     using g_renderer_storage
     free_mesh(quad_mesh)
     free_shader(quad_shader)
@@ -108,6 +110,8 @@ draw_quad :: proc(quad : Quad) {
     set_cull_face(.None)
     // enable_blending()
     // set_blend_function_separate(.Source_Alpha, .One_Minus_Source_Alpha, .One, .One_Minus_Source_Alpha)
+
+    using math
 
     transform := Transform{
         position = quad.position,

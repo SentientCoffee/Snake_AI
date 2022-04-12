@@ -1,24 +1,12 @@
 package renderer
 
-import "core:math/linalg"
+import "../math"
 
 import gl "vendor:OpenGL"
 
-Color :: linalg.Vector4f32
-
-Vector2    :: linalg.Vector2f32
-Vector3    :: linalg.Vector3f32
-Vector4    :: linalg.Vector4f32
-Quaternion :: linalg.Quaternionf32
-
-Mat4x4 :: linalg.Matrix4x4f32
-Mat3x3 :: linalg.Matrix3x3f32
-
-Mat4x4_Identity :: linalg.MATRIX4F32_IDENTITY
-Mat3x3_Identity :: linalg.MATRIX3F32_IDENTITY
+Color :: math.Vector4
 
 Buffer_Usage :: enum u32 {
-    // From glad.h
     Stream_Draw  = gl.STREAM_DRAW,
     Stream_Read  = gl.STREAM_READ,
     Stream_Copy  = gl.STREAM_COPY,
@@ -33,13 +21,13 @@ Buffer_Usage :: enum u32 {
 };
 
 Clear_Flags :: enum u32 {
-    Depth               = gl.DEPTH_BUFFER_BIT,
-    Color               = gl.COLOR_BUFFER_BIT,
-    Stencil             = gl.STENCIL_BUFFER_BIT,
-    No_Color            = Depth | Stencil,          // gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT
-    No_Depth            = Color | Stencil,          // gl.COLOR_BUFFER_BIT | gl.STENCIL_BUFFER_BIT
-    No_Stencil          = Color | Depth,            // gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT
-    All                 = Color | Depth | Stencil,  // gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT
+    Depth      = gl.DEPTH_BUFFER_BIT,
+    Color      = gl.COLOR_BUFFER_BIT,
+    Stencil    = gl.STENCIL_BUFFER_BIT,
+    No_Color   = Depth | Stencil,          // gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT
+    No_Depth   = Color | Stencil,          // gl.COLOR_BUFFER_BIT | gl.STENCIL_BUFFER_BIT
+    No_Stencil = Color | Depth,            // gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT
+    All        = Color | Depth | Stencil,  // gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT
 };
 
 Cull_Face :: enum u32 {
@@ -84,23 +72,43 @@ Source_Factor :: enum u32 {
     One_Minus_Constant_Alpha     = gl.ONE_MINUS_CONSTANT_ALPHA,
 };
 
-clear_screen :: proc(flags := Clear_Flags.All) { gl.Clear(cast(u32) flags) }
+clear_screen :: proc "c" (flags := Clear_Flags.All) {
+    gl.Clear(cast(u32) flags)
+}
 
-draw_indexed :: proc(mesh : ^Mesh) {
+draw_indexed :: proc"c" (mesh : ^Mesh) {
     gl.DrawElements(gl.TRIANGLES, cast(i32) mesh.index_buffer.index_count, gl.UNSIGNED_INT, nil);
 }
 
-set_viewport :: proc "c" (x, y, w, h : i32) {
-    gl.Viewport(x, y, w, h)
-    gl.Scissor(x, y, w, h)
-}
-
-enable_blending :: proc(enabled : bool) {
+enable_blending :: proc "c" (enabled : bool) {
     if enabled { gl.Enable(gl.BLEND)  }
     else       { gl.Disable(gl.BLEND) }
 }
 
-set_cull_face :: proc(face : Cull_Face) {
+enable_depth_test :: proc "c" (enabled : bool) {
+    if enabled { gl.Enable(gl.DEPTH_TEST)  }
+    else       { gl.Disable(gl.DEPTH_TEST) }
+}
+enable_depth_mask :: proc "c" (flag : bool) {
+    gl.DepthMask(flag);
+}
+
+set_blend_function :: proc { set_blend_function_normal, set_blend_function_separate }
+set_blend_function_normal :: proc "c" (source_factor : Source_Factor, destination_factor : Destination_Factor) {
+    gl.BlendFunc(cast(u32) source_factor, cast(u32) destination_factor);
+}
+set_blend_function_separate :: proc "c" (
+    colour_source_factor : Source_Factor, colour_destination_factor : Destination_Factor,
+    alpha_source_factor  : Source_Factor, alpha_destination_factor  : Destination_Factor,
+) {
+    gl.BlendFuncSeparate(cast(u32) colour_source_factor, cast(u32) colour_destination_factor, cast(u32) alpha_source_factor, cast(u32) alpha_destination_factor);
+}
+
+set_clear_color       :: proc { set_clear_color_color, set_clear_color_f32 }
+set_clear_color_color :: proc "c" (c : Color)        { gl.ClearColor(c.r, c.g, c.b, c.a) }
+set_clear_color_f32   :: proc "c" (r, g, b, a : f32) { gl.ClearColor(  r,   g,   b,   a) }
+
+set_cull_face :: proc "c" (face : Cull_Face) {
     if face == .None {
         gl.Disable(gl.CULL_FACE);
     }
@@ -110,25 +118,7 @@ set_cull_face :: proc(face : Cull_Face) {
     }
 }
 
-set_blend_function :: proc { set_blend_function_normal, set_blend_function_separate }
-set_blend_function_normal :: proc(source_factor : Source_Factor, destination_factor : Destination_Factor) {
-    gl.BlendFunc(cast(u32) source_factor, cast(u32) destination_factor);
+set_viewport :: proc "c" (x, y, w, h : i32) {
+    gl.Viewport(x, y, w, h)
+    gl.Scissor(x, y, w, h)
 }
-set_blend_function_separate :: proc(
-    colour_source_factor : Source_Factor, colour_destination_factor : Destination_Factor,
-    alpha_source_factor  : Source_Factor, alpha_destination_factor  : Destination_Factor,
-) {
-    gl.BlendFuncSeparate(cast(u32) colour_source_factor, cast(u32) colour_destination_factor, cast(u32) alpha_source_factor, cast(u32) alpha_destination_factor);
-}
-
-enable_depth_test :: proc(enabled : bool) {
-    if enabled { gl.Enable(gl.DEPTH_TEST)  }
-    else       { gl.Disable(gl.DEPTH_TEST) }
-}
-enable_depth_mask :: proc(flag : bool) {
-    gl.DepthMask(flag);
-}
-
-set_clear_color       :: proc{ set_clear_color_color, set_clear_color_f32 }
-set_clear_color_color :: proc(c : Color)        { gl.ClearColor(c.r, c.g, c.b, c.a) }
-set_clear_color_f32   :: proc(r, g, b, a : f32) { gl.ClearColor(  r,   g,   b,   a) }

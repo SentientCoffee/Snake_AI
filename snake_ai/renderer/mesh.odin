@@ -3,21 +3,22 @@ package renderer
 when ODIN_DEBUG {
     import log "../logging"
 }
+import "../math"
 
 import gl "vendor:OpenGL"
 
 Vertex :: struct {
-    position  : Vector3,
-    normal    : Vector3,
-    uv_coords : Vector2,
+    position  : math.Vector3,
+    normal    : math.Vector3,
+    uv_coords : math.Vector2,
 }
 
 Layout_Element :: struct {
-    name          : string,
-    data_type     : Shader_Data_Type,
-    size, offset  : uint,
-    components    : uint,
-    normalized    : bool,
+    name         : string,
+    data_type    : Shader_Data_Type,
+    size, offset : uint,
+    components   : uint,
+    normalized   : bool,
 }
 
 Vertex_Buffer_Layout :: struct {
@@ -116,7 +117,7 @@ new_vertex_buffer :: proc(vertices : []Vertex, layout : Vertex_Buffer_Layout, us
     gl.NamedBufferData(id, len(vertices) * size_of(Vertex), raw_data(vertices), cast(u32) usage)
 
     buffer  = new(Vertex_Buffer)
-    buffer^ = Vertex_Buffer{ Buffer{ id, buffer }, len(vertices), layout }
+    buffer^ = Vertex_Buffer{ { id, buffer }, len(vertices), layout }
     return
 }
 
@@ -129,7 +130,7 @@ new_index_buffer :: proc(indices : []u32, usage := Buffer_Usage.Static_Draw) -> 
     gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(indices) * size_of(u32), raw_data(indices), cast(u32) usage)
 
     buffer  = new(Index_Buffer)
-    buffer^ = Index_Buffer{ Buffer{ id, buffer }, len(indices) }
+    buffer^ = Index_Buffer{ { id, buffer }, len(indices) }
     return
 }
 

@@ -158,7 +158,7 @@ new_shader :: proc(name : string, stages : [Shader_Stage]cstring) -> (shader : ^
     uniform_count : i32
     gl.GetProgramiv(program_id, gl.ACTIVE_UNIFORMS, &uniform_count)
     if (uniform_count == 0) { return }
-    shader.uniforms = make(map[string]Uniform)
+    shader.uniforms = make(map[string]Uniform, uniform_count)
 
     max_name_length : i32
     gl.GetProgramiv(program_id, gl.ACTIVE_UNIFORM_MAX_LENGTH, &max_name_length);
