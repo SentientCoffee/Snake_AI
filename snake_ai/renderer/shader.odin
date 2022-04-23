@@ -15,7 +15,6 @@ Shader_Data_Type :: enum {
     Mat3, Mat4,
 };
 
-
 Shader_Stage :: enum {
     Vertex = 0,
     Tess_Control,

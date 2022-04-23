@@ -8,9 +8,9 @@ import "../math"
 import gl "vendor:OpenGL"
 
 Vertex :: struct {
-    position  : math.Vector3,
-    normal    : math.Vector3,
-    uv_coords : math.Vector2,
+    position  : math.Vector3 `in_position`,
+    normal    : math.Vector3 `in_normal`,
+    uv_coords : math.Vector2 `in_uv`,
 }
 
 Layout_Element :: struct {
@@ -28,10 +28,6 @@ Vertex_Buffer_Layout :: struct {
 
 Buffer :: struct {
     id : u32,
-    type : union {
-        ^Vertex_Buffer,
-        ^Index_Buffer,
-    },
 }
 
 Vertex_Buffer :: struct {
@@ -117,7 +113,7 @@ new_vertex_buffer :: proc(vertices : []Vertex, layout : Vertex_Buffer_Layout, us
     gl.NamedBufferData(id, len(vertices) * size_of(Vertex), raw_data(vertices), cast(u32) usage)
 
     buffer  = new(Vertex_Buffer)
-    buffer^ = Vertex_Buffer{ { id, buffer }, len(vertices), layout }
+    buffer^ = Vertex_Buffer{ { id }, len(vertices), layout }
     return
 }
 
@@ -130,7 +126,7 @@ new_index_buffer :: proc(indices : []u32, usage := Buffer_Usage.Static_Draw) -> 
     gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(indices) * size_of(u32), raw_data(indices), cast(u32) usage)
 
     buffer  = new(Index_Buffer)
-    buffer^ = Index_Buffer{ { id, buffer }, len(indices) }
+    buffer^ = Index_Buffer{ { id }, len(indices) }
     return
 }
 
@@ -138,6 +134,8 @@ free_buffer :: proc(buffer : ^Buffer) {
     gl.DeleteBuffers(1, &buffer.id)
     free(buffer)
 }
+
+// -----------------------------------------------------------------------------------
 
 new_mesh :: proc(vertices : []Vertex, indices : []u32) -> (mesh : ^Mesh) {
     id : u32

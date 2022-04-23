@@ -1,7 +1,7 @@
 package game
 
 // import log "../logging"
-import "../math"
+// import "../math"
 import "../renderer"
 
 import maths "core:math"
@@ -30,6 +30,18 @@ update :: proc() {
 }
 
 render :: proc() {
+    circle := renderer.Circle{
+        position  = { 100.0, 100.0, 0.0 },
+        radius    = 100.0,
+        thickness = 1.0,
+        fade      = 5e-2,
+        color     = { 0.8, 0.7, 0.2, 1.0 },
+    }
+
+    renderer.draw_circle(circle)
+
+    // -----------------
+
     aspect      :: f32(BOUNDS_WIDTH) / f32(BOUNDS_HEIGHT)
     back_y      := f32(window_height) / 2.0
     back_height := f32(window_height) - (40.0 * 2)
@@ -37,9 +49,9 @@ render :: proc() {
     back_x      := f32(window_width) - 40.0 - (back_width / 2.0)
 
     back := renderer.Quad{
-        position   = math.Vector3{ back_x, back_y, -10.0 },
-        dimensions = math.Vector2{ back_width, back_height },
-        tint       = renderer.Color{ 0.2, 0.2, 0.3, 1.0 },
+        position   = { back_x, back_y, -10.0 },
+        dimensions = { back_width, back_height },
+        color      = { 0.2, 0.2, 0.3, 1.0 },
     }
 
     cell_width  := back_width  / BOUNDS_WIDTH
@@ -50,24 +62,24 @@ render :: proc() {
     food_x := x_zero + (main_sim.food_position.x * cell_width)
     food_y := y_zero + (main_sim.food_position.y * cell_height)
     food := renderer.Quad{
-        position   = math.Vector3{ food_x, food_y, 0.0 },
-        dimensions = math.Vector2{ cell_width - 10.0, cell_height - 10.0 },
-        tint       = renderer.Color{ 0.8, 0.2, 0.3, 1.0 },
+        position   = { food_x, food_y, 0.0 },
+        dimensions = { cell_width - 10.0, cell_height - 10.0 },
+        color      = { 0.8, 0.2, 0.3, 1.0 },
     }
 
     head_x := x_zero + (main_sim.snake.head_position.x * cell_width)
     head_y := y_zero + (main_sim.snake.head_position.y * cell_height)
 
     snek_head := renderer.Quad{
-        position   = math.Vector3{ head_x, head_y, 0.0 },
-        dimensions = math.Vector2{ cell_width - 5.0, cell_height - 5.0 },
-        tint       = renderer.Color{ 0.2, 0.8, 0.3, 1.0 },
+        position   = { head_x, head_y, 0.0 },
+        dimensions = { cell_width - 5.0, cell_height - 5.0 },
+        color      = { 0.2, 0.8, 0.3, 1.0 },
     }
 
     snek_body := renderer.Quad{
-        position   = math.Vector3{ x_zero, y_zero, 0.0 },
-        dimensions = math.Vector2{ cell_width - 10.0, cell_height - 10.0 },
-        tint       = renderer.Color{ 0.2, 0.8, 0.3, 1.0 },
+        position   = { x_zero, y_zero, 0.0 },
+        dimensions = { cell_width - 10.0, cell_height - 10.0 },
+        color      = { 0.2, 0.8, 0.3, 1.0 },
     }
 
     renderer.draw_quad(back)
@@ -77,7 +89,7 @@ render :: proc() {
     for pos in main_sim.snake.real_body_positions {
         body_x := x_zero + (pos.x * cell_width)
         body_y := y_zero + (pos.y * cell_height)
-        snek_body.position = math.Vector3{ body_x, body_y, 0.0 }
+        snek_body.position = { body_x, body_y, 0.0 }
         renderer.draw_quad(snek_body)
     }
 }

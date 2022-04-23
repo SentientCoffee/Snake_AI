@@ -87,9 +87,9 @@ error :: #force_inline proc(identifier : string, format_string : string, args : 
     log.logf(Level_Error, "[{}] ERROR: {}\n", identifier, str)
 }
 
-assert_c :: #force_inline proc "c" (condition : bool, identifier : string, format_string : string, args : ..any) {
+assert_c :: #force_inline proc "c" (condition : bool, identifier : string, format_string : string, args : ..any, location := #caller_location) {
     context = log_ctx^
-    assert(condition, identifier, format_string, ..args)
+    assert(condition = condition, identifier = identifier, format_string = format_string, args = args, location = location)
 }
 assert :: #force_inline proc(condition : bool, identifier : string, format_string : string, args : ..any, location := #caller_location) {
     if condition { return }
