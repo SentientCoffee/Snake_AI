@@ -1,7 +1,8 @@
 package snake_ai
 
 import app "application"
-import "game"
+// import "game"
+import game "test"
 import "input"
 import log "logging"
 import "renderer"
@@ -45,6 +46,6 @@ main :: proc() {
 
 free_temp_storage :: proc() {
     if err := mem.free_all(context.temp_allocator); err != .None {
-        log.error("Temp allocator", "free_all == {}", err)
+        log.error("Temp allocator", "free_all error: {}", err)
     }
 }

@@ -75,13 +75,13 @@ Pixel_Type :: enum u32 {
 // }
 
 
-Texture2D :: struct {
+Texture_2D :: struct {
     rendering_id : u32,
     width, height: int,
 }
 
-new_texture_2d :: proc(width, height : int, data : rawptr, format := Internal_Format.RGBA8) -> (tex : ^Texture2D) {
-    tex = new(Texture2D)
+new_texture_2d :: proc(width, height : int, data : rawptr, format := Internal_Format.RGBA8) -> (tex : ^Texture_2D) {
+    tex = new(Texture_2D)
     tex.width = width
     tex.height = height
 
@@ -138,12 +138,12 @@ new_texture_2d :: proc(width, height : int, data : rawptr, format := Internal_Fo
     return
 }
 
-free_texture :: proc(using tex : ^Texture2D) {
+free_texture :: proc(using tex : ^Texture_2D) {
     gl.DeleteTextures(1, &rendering_id)
     free(tex)
 }
 
-bind_texture_to_slot :: proc(using tex : ^Texture2D, slot : u32) {
+bind_texture_to_slot :: proc(using tex : ^Texture_2D, slot : u32) {
     if tex != nil {
         when ODIN_DEBUG {
             log.assert(rendering_id != 0, "Texture 2D", "Invalid texture, unable to bind")

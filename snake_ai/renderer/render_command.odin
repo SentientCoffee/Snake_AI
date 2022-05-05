@@ -1,10 +1,6 @@
 package renderer
 
-import "../math"
-
 import gl "vendor:OpenGL"
-
-Color :: math.Vector4
 
 Buffer_Usage :: enum u32 {
     Stream_Draw  = gl.STREAM_DRAW,

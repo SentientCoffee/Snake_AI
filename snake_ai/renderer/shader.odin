@@ -55,11 +55,11 @@ Shader :: struct {
 }
 
 new_shader :: proc(name : string, stages : [Shader_Stage]cstring) -> (shader : ^Shader) {
-    get_shader_error :: proc(handle : u32) -> (ok : bool, error_log : cstring) {
+    get_shader_error :: proc(handle : u32) -> (ok : bool, error_log : string) {
         ok = false
         error_log = ""
 
-        success : i32 = 0
+        success : i32
         if gl.GetShaderiv(handle, gl.COMPILE_STATUS, &success); success > 0 {
             ok = true
             return
@@ -67,10 +67,10 @@ new_shader :: proc(name : string, stages : [Shader_Stage]cstring) -> (shader : ^
 
         log_length : i32
         gl.GetShaderiv(handle, gl.INFO_LOG_LENGTH, &log_length)
-        info_log := make([]u8, log_length)
+        info_log := make([]u8, log_length, context.temp_allocator); defer delete(info_log)
         gl.GetShaderInfoLog(handle, log_length, nil, raw_data(info_log))
 
-        error_log = strings.clone_to_cstring(strings.clone_from(info_log))
+        error_log = strings.clone_from(info_log, context.temp_allocator)
         return
     }
 
@@ -84,7 +84,7 @@ new_shader :: proc(name : string, stages : [Shader_Stage]cstring) -> (shader : ^
 
         stage := Shader_Stage(i)
         log.debug(shader_ident, "Attaching {} shader...", stage)
-        shader_handle : u32 = 0
+        shader_handle : u32
 
         switch stage {
             case .Vertex:          shader_handle = gl.CreateShader(gl.VERTEX_SHADER)
@@ -107,7 +107,9 @@ new_shader :: proc(name : string, stages : [Shader_Stage]cstring) -> (shader : ^
         }
     }
 
-    get_program_error :: proc(handle : u32) -> (ok : bool, error_log : cstring) {
+    // -----------------
+
+    get_program_error :: proc(handle : u32) -> (ok : bool, error_log : string) {
         ok = false
         error_log = ""
 
@@ -119,10 +121,10 @@ new_shader :: proc(name : string, stages : [Shader_Stage]cstring) -> (shader : ^
 
         log_length : i32
         gl.GetProgramiv(handle, gl.INFO_LOG_LENGTH, &log_length)
-        info_log := make([]u8, log_length)
+        info_log := make([]u8, log_length, context.temp_allocator); defer delete(info_log)
         gl.GetProgramInfoLog(handle, log_length, nil, raw_data(info_log))
 
-        error_log = strings.clone_to_cstring(strings.clone_from(info_log))
+        error_log = strings.clone_from(info_log, context.temp_allocator)
         return
     }
 
