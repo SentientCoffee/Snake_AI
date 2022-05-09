@@ -3,7 +3,7 @@
 pushd %~dp0
 
 set exe_name=snake_ai
-set collections=
+set collections=-collection:engine=engine -collection:game=snake_ai
 
 :: Release build config
 set level=speed
@@ -23,9 +23,10 @@ if "%2"=="vet" (
     set vet_flag=-vet
 )
 
-echo Building %dir% binary...
+echo ===== Building %dir% binary... =====
 if not exist "build\%dir%\" mkdir "build\%dir%\"
 
 odin build snake_ai -out:"build\%dir%\%exe_name%.exe" %collections% -o:%level% -microarch:native %debug_flag% %vet_flag% -show-timings
 
+echo ===== Done. =====
 popd

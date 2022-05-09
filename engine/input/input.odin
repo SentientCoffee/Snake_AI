@@ -1,7 +1,7 @@
 package input
 
 when ODIN_DEBUG {
-    import log "../logging"
+    import log "engine:logging"
 }
 
 import "vendor:glfw"

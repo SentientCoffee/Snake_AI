@@ -1,7 +1,7 @@
 package renderer
 
 when ODIN_DEBUG {
-    import log "../logging"
+    import log "engine:logging"
 }
 
 import gl "vendor:OpenGL"

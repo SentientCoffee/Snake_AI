@@ -1,19 +1,17 @@
 package logging
 
-import "core:fmt"
-
 import gl "vendor:OpenGL"
 
 glfw_error_callback :: proc "c" (error_code : i32, message : cstring) {
     error_c("GLFW", "({}) {}", error_code, message)
 }
 
-gl_error_callback :: proc "c" (source : u32, type : u32, id : u32, severity : u32, length : i32, message : cstring, userParam : rawptr) {
+gl_error_callback :: proc "c" (source : u32, debug_type : u32, id : u32, severity : u32, length : i32, message : cstring, user_param : rawptr) {
     // @Note(Daniel): Ignore non-significant error/warning codes.
     if id == 131169 || id == 131185 || id == 131218 || id == 131204 { return }
 
     type_str : string
-    switch type {
+    switch debug_type {
         case gl.DEBUG_TYPE_ERROR:                   type_str = "ERROR"
         case gl.DEBUG_TYPE_DEPRECATED_BEHAVIOR:     type_str = "DEPRECATED BEHAVIOUR"
         case gl.DEBUG_TYPE_UNDEFINED_BEHAVIOR:      type_str = "UNDEFINED BEHAVIOUR"
@@ -48,13 +46,36 @@ gl_error_callback :: proc "c" (source : u32, type : u32, id : u32, severity : u3
 
     context = log_ctx^
     ogl :: "OpenGL"
-    msg := fmt.tprintf("{} (0x{:8x}): {}SOURCE:   {}\nSEVERITY: {}", type_str, id, message, source_str, severity_str);
-
     switch {
-        case type     == gl.DEBUG_TYPE_ERROR:      assert_c (false, ogl, msg)
-        case severity == gl.DEBUG_SEVERITY_HIGH:   error_c  (       ogl, msg)
-        case severity == gl.DEBUG_SEVERITY_MEDIUM: warning_c(       ogl, msg)
-        case severity == gl.DEBUG_SEVERITY_LOW:    info_c   (       ogl, msg)
-        case:                                      debug_c  (       ogl, msg);
+        case debug_type == gl.DEBUG_TYPE_ERROR: {
+            error_c(        ogl, "{} (0x{:8x})",     type_str, id)
+            error_c(        ogl, "    {}",           message)
+            error_c(        ogl, "    SOURCE:   {}", source_str)
+            assert_c(false, ogl, "    SEVERITY: {}", severity_str)
+        }
+        case severity == gl.DEBUG_SEVERITY_HIGH: {
+            error_c(ogl, "{} (0x{:8x})",     type_str, id)
+            error_c(ogl, "    {}",           message)
+            error_c(ogl, "    SOURCE:   {}", source_str)
+            error_c(ogl, "    SEVERITY: {}", severity_str)
+        }
+        case severity == gl.DEBUG_SEVERITY_MEDIUM: {
+            warning_c(ogl, "{} (0x{:8x})",     type_str, id)
+            warning_c(ogl, "    {}",           message)
+            warning_c(ogl, "    SOURCE:   {}", source_str)
+            warning_c(ogl, "    SEVERITY: {}", severity_str)
+        }
+        case severity == gl.DEBUG_SEVERITY_LOW: {
+            info_c(ogl, "{} (0x{:8x})",     type_str, id)
+            info_c(ogl, "    {}",           message)
+            info_c(ogl, "    SOURCE:   {}", source_str)
+            info_c(ogl, "    SEVERITY: {}", severity_str)
+        }
+        case: {
+            debug_c(ogl, "{} (0x{:8x})",     type_str, id)
+            debug_c(ogl, "    {}",           message)
+            debug_c(ogl, "    SOURCE:   {}", source_str)
+            debug_c(ogl, "    SEVERITY: {}", severity_str)
+        }
     }
 }

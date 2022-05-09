@@ -1,11 +1,11 @@
 package snake_ai
 
-import app "application"
-// import "game"
-import game "test"
-import "input"
-import log "logging"
-import "renderer"
+import app "engine:application"
+import "engine:input"
+import log "engine:logging"
+import "engine:renderer"
+
+import game "game:examples/1_perceptron"
 
 import "core:mem"
 
@@ -15,7 +15,7 @@ TITLE  :: "Snek AI"
 
 main :: proc() {
     ctx := context
-    log.create_console_logger(&ctx, log.Level_Debug)
+    log.create_console_logger(&ctx, log.Level_Info)
     context = ctx
 
     window := app.create_window(WIDTH, HEIGHT, TITLE)

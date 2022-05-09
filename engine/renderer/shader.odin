@@ -1,6 +1,6 @@
 package renderer
 
-import log "../logging"
+import log "engine:logging"
 
 import "core:intrinsics"
 import "core:fmt"

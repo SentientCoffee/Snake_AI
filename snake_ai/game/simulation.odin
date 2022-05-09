@@ -1,9 +1,9 @@
 package game
 
-import app "../application"
-import "../input"
-import log "../logging"
-import "../math"
+import app "snake_ai:application"
+import "snake_ai:input"
+import log "snake_ai:logging"
+import "snake_ai:math"
 
 import "core:math/rand"
 

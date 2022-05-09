@@ -1,10 +1,8 @@
 package game
 
 // import log "../logging"
-// import "../math"
-import "../renderer"
-
-import maths "core:math"
+import "snake_ai:math"
+import "snake_ai:renderer"
 
 BOUNDS_WIDTH  :: 24
 BOUNDS_HEIGHT :: 18
@@ -45,7 +43,7 @@ render :: proc() {
     aspect      :: f32(BOUNDS_WIDTH) / f32(BOUNDS_HEIGHT)
     back_y      := f32(window_height) / 2.0
     back_height := f32(window_height) - (40.0 * 2)
-    back_width  := maths.floor(back_height * aspect)
+    back_width  := math.floor(back_height * aspect)
     back_x      := f32(window_width) - 40.0 - (back_width / 2.0)
 
     back := renderer.Quad{

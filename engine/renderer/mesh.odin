@@ -1,9 +1,9 @@
 package renderer
 
 when ODIN_DEBUG {
-    import log "../logging"
+    import log "engine:logging"
 }
-import "../math"
+import "engine:math"
 
 import gl "vendor:OpenGL"
 

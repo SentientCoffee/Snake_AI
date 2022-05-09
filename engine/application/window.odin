@@ -1,8 +1,8 @@
 package application
 
-import "../input"
-import log "../logging"
-import "../renderer"
+import "engine:input"
+import log "engine:logging"
+import "engine:renderer"
 
 import "core:strings"
 

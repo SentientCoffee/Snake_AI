@@ -1,8 +1,14 @@
 package renderer
 
-import "../math"
+import "engine:math"
 
 Color :: math.Vector4
+
+Line :: struct {
+    start, end : math.Vector3,
+    thickness  : f32,
+    color      : Color,
+}
 
 Quad :: struct {
     position   : math.Vector3,
@@ -10,7 +16,7 @@ Quad :: struct {
     color      : Color,
 
     // @Todo: Textures
-    // texture : rawptr = nil
+    // texture       : ^Texture_2D,
     // tiling_factor : f64 = 1.0,
 }
 
@@ -39,6 +45,7 @@ Renderer_Storage :: struct {
 init :: proc(width, height : int) {
     quad_indices  :: []u32 { 0, 1, 2, 0, 2, 3 };
     quad_vertices :: []Vertex {
+        // @Robustness: The texture UVs assume top-down rendering, should probably have a choice about this.
         { position = { -0.5, -0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 0.0, 1.0 } },
         { position = {  0.5, -0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 1.0, 1.0 } },
         { position = {  0.5,  0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 1.0, 0.0 } },
@@ -46,7 +53,7 @@ init :: proc(width, height : int) {
     }
 
     using g_renderer_storage
-    init_camera(&camera, 0, cast(f32) width, 0, cast(f32) height)
+    init_camera(&camera, 0, cast(f32) width, 0, cast(f32) height) // @Note: Top-down rendering
     quad_mesh     = new_mesh(quad_vertices, quad_indices)
     quad_shader   = new_2d_quad_shader()
     circle_shader = new_2d_circle_shader()
@@ -61,6 +68,43 @@ destroy :: proc() {
     free_texture(white_texture)
 }
 
+draw_line :: proc(line : Line) {
+    using g_renderer_storage
+    using math
+
+    enable_depth_test(true); defer enable_depth_test(false)
+    enable_blending(true);   defer enable_blending(false)
+    set_blend_function(.Source_Alpha, .One_Minus_Source_Alpha)
+    set_cull_face(.None)
+
+    line_dot    : f32 = vector_dot(line.end - line.start, math.Vector3{ 1, 0, 0 })
+    line_length : f32 = vector_length(line.end - line.start)
+
+    // @Note: (1, 0, 0) has length 1, so line_length * 1 is redundant
+    // @Note: Not sure why this needs to be negative?
+    //        I think it has to do with my UI being top-down rather than bottom-up,
+    //        so maybe check the camera projection when drawing lines?
+    angle : f32 = -acos(line_dot / (line_length))
+
+    transform := Transform{
+        position = line.start + (line.end - line.start) / 2.0,
+        rotation = create_rotation_radians({ 0, 0, angle }),
+        scale    = { vector_length(line.end - line.start), line.thickness, 1 },
+        parent   = Mat4x4_Identity,
+    }
+
+    bind_texture_to_slot(white_texture, 0); defer bind_texture_to_slot(nil, 0)
+    bind_shader(quad_shader); defer bind_shader(nil)
+    set_shader_uniform(quad_shader, "u_view_projection", matrix_flatten(get_view_projection_matrix(camera)))
+    set_shader_uniform(quad_shader, "u_transform", matrix_flatten(get_world_transform(transform)))
+    set_shader_uniform(quad_shader, "u_texture_slot", 0)
+    set_shader_uniform(quad_shader, "u_color", line.color)
+    set_shader_uniform(quad_shader, "u_tile_factor", 1.0)
+
+    set_mesh_for_rendering(quad_mesh); defer set_mesh_for_rendering(nil)
+    draw_indexed(quad_mesh)
+}
+
 draw_quad :: proc(quad : Quad) {
     using g_renderer_storage
     using math
@@ -72,8 +116,8 @@ draw_quad :: proc(quad : Quad) {
 
     transform := Transform{
         position = quad.position,
-        rotation = create_rotation_radians(Vector3{ 0, 0, 0 }),
-        scale    = Vector3{ quad.dimensions.x, quad.dimensions.y, 1 },
+        rotation = create_rotation_radians({ 0, 0, 0 }),
+        scale    = { quad.dimensions.x, quad.dimensions.y, 1 },
         parent   = Mat4x4_Identity,
     }
 
@@ -100,8 +144,8 @@ draw_circle :: proc(circle : Circle) {
 
     transform := Transform{
         position = circle.position,
-        rotation = create_rotation_radians(Vector3{ 0, 0, 0 }),
-        scale    = Vector3{ circle.radius, circle.radius, 1 },
+        rotation = create_rotation_radians({ 0, 0, 0 }),
+        scale    = { circle.radius, circle.radius, 1 },
         parent   = Mat4x4_Identity,
     }
 
@@ -110,7 +154,7 @@ draw_circle :: proc(circle : Circle) {
     set_shader_uniform(circle_shader, "u_transform", matrix_flatten(get_world_transform(transform)))
     set_shader_uniform(circle_shader, "u_color", circle.color)
     set_shader_uniform(circle_shader, "u_thickness", circle.thickness)
-    set_shader_uniform(circle_shader, "u_fade", circle.fade)
+    set_shader_uniform(circle_shader, "u_fade", circle.fade if circle.fade > 1e-8 else 4.0 / circle.radius)
 
     set_mesh_for_rendering(quad_mesh); defer set_mesh_for_rendering(nil)
     draw_indexed(quad_mesh)

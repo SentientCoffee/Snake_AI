@@ -1,6 +1,6 @@
 package game
 
-import "../math"
+import "snake_ai:math"
 
 Snake_Direction :: enum {
     Up    = 0,
@@ -29,7 +29,7 @@ new_snake :: proc(start_position := math.Vector2{ 1, 0 }) -> (snake : ^Snake) {
     snake.real_body_directions = make([dynamic]Snake_Direction, 0, 100)
 
     append(&snake.real_body_positions, start_position + math.Vector2{ -1, 0 })
-    append(&snake.real_body_directions, Snake_Direction.Right)  // @Note(Daniel): ols dies if I use implicit selection here. - 11 Apr 2022 18:00
+    append(&snake.real_body_directions, Snake_Direction.Right)  // @Note: ols dies if I use implicit selection here. - 11 Apr 2022 18:00
 
     return
 }
