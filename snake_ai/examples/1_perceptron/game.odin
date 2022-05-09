@@ -23,7 +23,7 @@ start :: proc(width, height : int) {
     window_height = height
 
     g_training_index = 0
-    g_brain = make_perceptron(num_weights = 3)
+    g_brain = make_perceptron(num_weights = 3, learning_rate = 0.008)
     for p in &g_points {
         p = make_random_point(point_min, point_max, line_func)
     }
@@ -47,12 +47,14 @@ render :: proc() {
 
     for p, i in g_points {
         guess := perceptron_guess(g_brain, []f32{ p.position.x, p.position.y, p.bias })
-        color := renderer.Color{ 0.8, 0.2, 0.3, 1.0 }
-        if guess == p.target {
-            color = renderer.Color{ 0.2, 0.8, 0.3, 1.0 }
-        }
-        draw_point(point = p, z_index = f32(-i) - 0.5, thickness = 0.3)
-        draw_point(point = p, z_index = f32(-i), radius = 18.0, color = color)
+        fill_color   := renderer.Color{ 0.8, 0.2, 0.3, 1.0 }
+        stroke_color := renderer.Color{ 0.0, 0.0, 0.0, 1.0 }
+
+        if guess == p.target { fill_color   = { 0.2, 0.8, 0.3, 1.0 } }
+        if p.target > 0      { stroke_color = { 1.0, 1.0, 1.0, 1.0 } }
+
+        draw_point(point = p, z_index = f32(-i) - 0.5, thickness = 0.3, color = stroke_color)
+        draw_point(point = p, z_index = f32(-i), radius = 18.0, color = fill_color)
     }
 }
 
@@ -78,7 +80,7 @@ draw_real_line :: proc() {
     end_pos := math.Vector3 {
         math.remap(      f32(1.0), point_min.x, point_max.x, 0.0, f32(window_width)),
         math.remap(line_func(1.0), point_min.y, point_max.y, 0.0, f32(window_height)),
-        -100,
+        -150,
     }
 
     renderer.draw_line({
@@ -91,7 +93,7 @@ draw_real_line :: proc() {
 
 draw_perceptron_line :: proc(p : Perceptron) {
     perceptron_line_func :: proc(p : Perceptron, x : f32) -> f32 {
-        return -(p.weights[2] / p.weights[1]) + (p.weights[0] / p.weights[1]) * x
+        return -(p.weights[2] / p.weights[1]) - (p.weights[0] / p.weights[1]) * x
     }
 
     start_pos := math.Vector3{
@@ -102,7 +104,7 @@ draw_perceptron_line :: proc(p : Perceptron) {
     end_pos := math.Vector3 {
         math.remap(                    f32(1.0), point_min.x, point_max.x, 0.0, f32(window_width)),
         math.remap(perceptron_line_func(p, 1.0), point_min.y, point_max.y, 0.0, f32(window_height)),
-        -100,
+        -150,
     }
 
     renderer.draw_line({

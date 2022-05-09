@@ -87,8 +87,11 @@ draw_line :: proc(line : Line) {
     line_dot    : f32 = vector_dot(line.end - line.start, math.Vector3{ 1, 0, 0 })
     line_length : f32 = vector_length(line.end - line.start)
 
+    // @Note: Bugs out if the start point is above the end point because we calculate relative distance
+    //        without considering direction. So we calculate the proper direction here.
+    sign : f32 = 1.0 if line.end.y >= line.start.y else -1.0
     // @Note: (1, 0, 0) has length 1, so line_length * 1 is redundant
-    angle : f32 = acos(line_dot / (line_length))
+    angle : f32 = sign * acos(line_dot / (line_length))
 
     transform := Transform{
         position = line.start + (line.end - line.start) / 2.0,
