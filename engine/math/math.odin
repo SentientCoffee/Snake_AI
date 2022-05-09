@@ -2,6 +2,7 @@ package game_math
 
 import "core:math"
 import "core:math/linalg"
+import "core:math/rand"
 
 Vector2    :: linalg.Vector2f32
 Vector3    :: linalg.Vector3f32
@@ -19,9 +20,14 @@ Mat3x3_Identity :: linalg.MATRIX3F32_IDENTITY
 acos  :: math.acos
 
 floor :: math.floor
+lerp  :: math.lerp
 
 matrix_ortho3d  :: linalg.matrix_ortho3d
 matrix4_inverse :: linalg.matrix4_inverse
+
+random_f32 :: rand.float32_range
+
+remap :: math.remap
 
 vector_cross   :: linalg.vector_cross
 vector_dot     :: linalg.vector_dot

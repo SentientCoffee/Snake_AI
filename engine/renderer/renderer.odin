@@ -46,14 +46,21 @@ init :: proc(width, height : int) {
     quad_indices  :: []u32 { 0, 1, 2, 0, 2, 3 };
     quad_vertices :: []Vertex {
         // @Robustness: The texture UVs assume top-down rendering, should probably have a choice about this.
-        { position = { -0.5, -0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 0.0, 1.0 } },
-        { position = {  0.5, -0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 1.0, 1.0 } },
-        { position = {  0.5,  0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 1.0, 0.0 } },
-        { position = { -0.5,  0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 0.0, 0.0 } },
+        // { position = { -0.5, -0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 0.0, 1.0 } },
+        // { position = {  0.5, -0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 1.0, 1.0 } },
+        // { position = {  0.5,  0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 1.0, 0.0 } },
+        // { position = { -0.5,  0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 0.0, 0.0 } },
+
+        // @Note: Bottom-up rendering
+        { position = { -0.5, -0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 0.0, 0.0 } },
+        { position = {  0.5, -0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 1.0, 0.0 } },
+        { position = {  0.5,  0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 1.0, 1.0 } },
+        { position = { -0.5,  0.5, 0.0 }, normal = { 0.0, 0.0, 0.0 }, uv_coords = { 0.0, 1.0 } },
     }
 
     using g_renderer_storage
-    init_camera(&camera, 0, cast(f32) width, 0, cast(f32) height) // @Note: Top-down rendering
+    init_camera(&camera, 0, cast(f32) width, cast(f32) height, 0) // @Note: Bottom-up rendering
+    // init_camera(&camera, 0, cast(f32) width, 0, cast(f32) height) // @Note: Top-down rendering
     quad_mesh     = new_mesh(quad_vertices, quad_indices)
     quad_shader   = new_2d_quad_shader()
     circle_shader = new_2d_circle_shader()
@@ -81,10 +88,7 @@ draw_line :: proc(line : Line) {
     line_length : f32 = vector_length(line.end - line.start)
 
     // @Note: (1, 0, 0) has length 1, so line_length * 1 is redundant
-    // @Note: Not sure why this needs to be negative?
-    //        I think it has to do with my UI being top-down rather than bottom-up,
-    //        so maybe check the camera projection when drawing lines?
-    angle : f32 = -acos(line_dot / (line_length))
+    angle : f32 = acos(line_dot / (line_length))
 
     transform := Transform{
         position = line.start + (line.end - line.start) / 2.0,

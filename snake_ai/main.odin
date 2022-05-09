@@ -9,7 +9,7 @@ import game "game:examples/1_perceptron"
 
 import "core:mem"
 
-WIDTH  :: 1600
+WIDTH  :: 900
 HEIGHT :: 900
 TITLE  :: "Snek AI"
 
