@@ -1,7 +1,7 @@
 package perceptron1
 
 // import app "engine:application"
-// import "engine:input"
+import "engine:input"
 // import log "engine:logging"
 import "engine:math"
 import "engine:renderer"
@@ -9,6 +9,7 @@ import "engine:renderer"
 g_brain  : Perceptron
 g_points : [100]Point
 g_training_index : int
+g_started := false
 
 @(private) window_width  : int = 0
 @(private) window_height : int = 0
@@ -34,6 +35,9 @@ end :: proc() {
 }
 
 update :: proc() {
+    if input.key_down(.Space) { g_started = true }
+    if !g_started { return }
+
     p := g_points[g_training_index]
     perceptron_train(&g_brain, []f32{ p.position.x, p.position.y, p.bias }, p.target)
 
@@ -72,7 +76,7 @@ draw_point :: proc(using point : Point, z_index : f32 = 0.0, radius : f32 = 20.0
 }
 
 draw_real_line :: proc() {
-    start_pos := math.Vector3{
+    start_pos := math.Vector3 {
         math.remap(      f32(-1.0), point_min.x, point_max.x, 0.0, f32(window_width)),
         math.remap(line_func(-1.0), point_min.y, point_max.y, 0.0, f32(window_height)),
         -150,
