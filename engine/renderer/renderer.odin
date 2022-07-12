@@ -59,8 +59,8 @@ init :: proc(width, height : int) {
     }
 
     using g_renderer_storage
-    init_camera(&camera, 0, cast(f32) width, cast(f32) height, 0) // @Note: Bottom-up rendering
-    // init_camera(&camera, 0, cast(f32) width, 0, cast(f32) height) // @Note: Top-down rendering
+    init_camera(&camera, 0, cast(f32) width, cast(f32) height, 0)    // @Note: Bottom-up rendering
+    // init_camera(&camera, 0, cast(f32) width, 0, cast(f32) height)    // @Note: Top-down rendering
     quad_mesh     = new_mesh(quad_vertices, quad_indices)
     quad_shader   = new_2d_quad_shader()
     circle_shader = new_2d_circle_shader()

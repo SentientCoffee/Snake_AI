@@ -33,7 +33,7 @@ else {
 // -----------------------------------------------------------------------------------
 
 create_console_logger :: proc(ctx : ^runtime.Context, lowest_level := Level_Debug, options := default_logger_options) {
-    ctx.logger = Logger{
+    ctx.logger = Logger {
         data = nil,
         lowest_level = lowest_level,
         options = options,
@@ -94,18 +94,19 @@ assert_c :: #force_inline proc "c" (condition : bool, identifier : string, forma
 assert :: #force_inline proc(condition : bool, identifier : string, format_string : string, args : ..any, location := #caller_location) {
     if condition { return }
 
-    b : strings.Builder
-    strings.init_builder(&b)
+    b := strings.make_builder(context.temp_allocator)
     defer strings.destroy_builder(&b)
 
     str := fmt.tprintf(format_string, ..args)
-    split := strings.split(str, "\n")
+    split := strings.split(str, "\n", context.temp_allocator)
 
     for s in split {
-        if len(s) == 0 { continue }
-        for _ in 0 ..< len(identifier) + 5 { strings.write_string_builder(&b, " ") }
-        strings.write_string_builder(&b, s)
-        strings.write_byte(&b, '\n')
+        if len(s) == 0 {
+            fmt.sbprintln(&b)
+            continue
+        }
+        for _ in 0 ..< len(identifier) + 5 { strings.write_byte(&b, ' ') }
+        fmt.sbprintf(&b, "{}\n", s)
     }
 
     _sep :: "------------------------------------------------------------------------------------"
