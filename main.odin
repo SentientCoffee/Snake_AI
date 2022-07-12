@@ -1,15 +1,16 @@
 package snake_ai
 
 import app "engine:application"
-import "engine:input"
+import     "engine:input"
 import log "engine:logging"
-import "engine:renderer"
+import     "engine:renderer"
 
-import game "game:examples/1_perceptron"
+// import game "game:examples/1_perceptron"
+import game "game:examples/2_feedforward"
 
 import "core:mem"
 
-WIDTH  :: 900
+WIDTH  :: 1600
 HEIGHT :: 900
 TITLE  :: "Snek AI"
 
