@@ -24,9 +24,9 @@ if "%2"=="vet" (
 )
 
 echo ===== Building %dir% binary... =====
-if not exist "build\%dir%\" mkdir "build\%dir%\"
 
-odin build snake_ai -out:"build\%dir%\%exe_name%.exe" %collections% -o:%level% -microarch:native %debug_flag% %vet_flag% -show-timings
+if not exist "build\%dir%\" mkdir "build\%dir%\"
+odin build main.odin -file -out:"build\%dir%\%exe_name%.exe" %collections% -o:%level% -microarch:native %debug_flag% %vet_flag% -show-timings
 
 echo ===== Done. =====
 popd

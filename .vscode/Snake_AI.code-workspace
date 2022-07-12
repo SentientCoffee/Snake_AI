@@ -5,8 +5,16 @@
       "path": "..",
     },
     {
+      "name": "Engine",
+      "path": "../engine",
+    },
+    {
       "name": "Source",
       "path": "../snake_ai",
+    },
+    {
+      "name": "Odin core",
+      "path": "C:/dev/odin/core"
     },
   ],
   "launch": {
